@@ -215,6 +215,29 @@ footer .small{margin-top:34px;padding-top:20px;border-top:1px solid #39407a;font
 #door.open .plaque{opacity:0}
 #door .plaque p{max-width:none;font-family:var(--display);font-weight:600;font-size:clamp(1.15rem,3vw,1.75rem);line-height:1.4}
 
+
+/* hero words */
+.hero .lead{font-size:1.15rem;margin-top:12px}
+
+/* congratulations card */
+#cheer{position:fixed;inset:0;z-index:1200;display:none;align-items:center;justify-content:center;background:rgba(11,16,48,.74);padding:20px}
+#cheer.show{display:flex}
+.cheer-card{position:relative;z-index:2;background:var(--white);border:3px solid var(--navy);border-radius:22px;box-shadow:8px 8px 0 var(--yellow);padding:38px 30px;text-align:center;width:min(440px,92vw);overflow:hidden;animation:pop .55s cubic-bezier(.2,1.4,.4,1) both}
+.cheer-card::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(110deg,transparent 35%,rgba(255,228,94,.6) 50%,transparent 65%);background-size:250% 100%;animation:shine 1.8s linear infinite}
+.cheer-card h2{color:var(--cobalt);margin-bottom:10px}
+.cheer-card p{margin:0 auto;font-size:1.1rem}
+.cheer-card .count{margin-top:14px;font-weight:600}
+.cheer-star{font-size:3.2rem;line-height:1;color:var(--coral);animation:spin 3s linear infinite}
+.spark{position:fixed;left:50%;top:50%;z-index:1;pointer-events:none;line-height:1;animation:spark var(--t) ease-out forwards;text-shadow:0 0 8px rgba(255,228,94,.9)}
+@keyframes pop{from{transform:scale(.55);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes shine{from{background-position:150% 0}to{background-position:-100% 0}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes spark{
+  0%{transform:translate(-50%,-50%) scale(0) rotate(0);opacity:1}
+  20%{opacity:1}
+  100%{transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(1) rotate(var(--r));opacity:0}
+}
+
 /* responsive */
 @media (max-width:900px){
   .hero .grid,.about-grid,.contact-grid{grid-template-columns:1fr}
@@ -249,6 +272,15 @@ footer .small{margin-top:34px;padding-top:20px;border-top:1px solid #39407a;font
   <div class="leaf r"></div>
   <div class="plaque"><p id="doorText"></p></div>
 </div>
+<div id="cheer" role="dialog" aria-live="polite" aria-label="Congratulations">
+  <div class="sparks" id="sparks"></div>
+  <div class="cheer-card">
+    <div class="cheer-star">✦</div>
+    <h2>Congratulations!</h2>
+    <p>You found the right copywriter.</p>
+    <p class="count">Opening in <span id="cnt">5</span></p>
+  </div>
+</div>
 <div id="bar"></div>
 
 <header>
@@ -262,7 +294,7 @@ footer .small{margin-top:34px;padding-top:20px;border-top:1px solid #39407a;font
       <a href="#/work" data-link data-page="work">Case studies</a>
       <a href="#/reviews" data-link data-page="reviews">Reviews</a>
       <a href="#/process" data-link data-page="process">Process</a>
-      <a href="#/contact" data-link data-page="contact" class="hire">Hire me</a>
+      <a href="#/contact" data-link data-page="contact" class="hire" data-celebrate>Hire me</a>
     </nav>
   </div>
 </header>
@@ -275,9 +307,13 @@ footer .small{margin-top:34px;padding-top:20px;border-top:1px solid #39407a;font
     <div class="wrap grid">
       <div>
         <h1>I write words. You get buyers.</h1>
-        <p class="lead">I am Saheed Hamza, a copywriter. I write website pages, sales pages, emails, blog posts, SEO content, social media posts, product descriptions, business content, and more. Your visitors understand your offer fast and buy.</p>
+        <p class="lead">I am Saheed Hamza, a copywriter.</p>
+        <p class="lead">My nickname is the Wizard Copywriter. Why do people call me the Wizard Copywriter?</p>
+        <p class="lead">Yes, because I write like a wizard! 🧙‍♂️</p>
+        <p class="lead">I don't write words that fail to sell or convert. I write words that persuade people to take action.</p>
+        <p class="lead">That is what makes me different. I write website pages, sales pages, emails, blog posts, SEO content, social media posts, product descriptions, business content, and more. Your visitors understand your offer fast and buy.</p>
         <div class="row">
-          <a class="btn" href="#/contact" data-link>Hire me now</a>
+          <a class="btn" href="#/contact" data-link data-celebrate>Hire me now</a>
           <a class="btn alt" href="#/work" data-link>See my results</a>
         </div>
       </div>
@@ -387,7 +423,7 @@ footer .small{margin-top:34px;padding-top:20px;border-top:1px solid #39407a;font
         <h2 style="margin-top:34px">Words and design in one place</h2>
         <p>I design graphics too. Your words and your visuals match. You work with one person, not two.</p>
         <div class="row">
-          <a class="btn" href="#/contact" data-link>Work with me</a>
+          <a class="btn" href="#/contact" data-link data-celebrate>Work with me</a>
           <a class="btn alt" href="#/work" data-link>Read case studies</a>
         </div>
       </div>
@@ -694,13 +730,14 @@ document.querySelectorAll('[data-reviews]').forEach(function(box){
 var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 function typeIt(el){
   var full = el.dataset.full, d = el.firstChild, h = el.lastChild;
-  var step = Math.max(1, Math.ceil(full.length / 90)), i = 0;
+  var chars = Array.from(full);
+  var step = Math.max(1, Math.ceil(chars.length / 90)), i = 0;
   el.classList.add('typing');
   var t = setInterval(function(){
-    i = Math.min(full.length, i + step);
-    d.textContent = full.slice(0, i);
-    h.textContent = full.slice(i);
-    if (i >= full.length){ clearInterval(t); el.classList.remove('typing'); }
+    i = Math.min(chars.length, i + step);
+    d.textContent = chars.slice(0, i).join('');
+    h.textContent = chars.slice(i).join('');
+    if (i >= chars.length){ clearInterval(t); el.classList.remove('typing'); }
   }, 24);
 }
 if (!reduce){
@@ -837,6 +874,64 @@ document.getElementById('form').addEventListener('submit', function(ev){
       document.body.style.overflow = '';
     }, 2500);
   }, 15000);
+})();
+
+/* congratulations card: shows 5 seconds with sparkles, then opens the hire page */
+(function(){
+  var cheer = document.getElementById('cheer');
+  var sparks = document.getElementById('sparks');
+  var cnt = document.getElementById('cnt');
+  var busy = false;
+  var colors = ['#ffe45e','#ffffff','#ff6b57','#7f8cff','#ffd23f'];
+  var glyphs = ['\u2726','\u2605','\u2727','\u2022'];
+  function burst(n){
+    if (reduce) return;
+    for (var k = 0; k < n; k++){
+      var sp = document.createElement('span');
+      sp.className = 'spark';
+      sp.textContent = glyphs[Math.floor(Math.random() * glyphs.length)];
+      var ang = Math.random() * Math.PI * 2;
+      var max = Math.min(window.innerWidth, window.innerHeight) * 0.6 + 120;
+      var dist = 70 + Math.random() * max;
+      sp.style.setProperty('--dx', Math.cos(ang) * dist + 'px');
+      sp.style.setProperty('--dy', Math.sin(ang) * dist + 'px');
+      sp.style.setProperty('--r', (Math.random() * 720 - 360) + 'deg');
+      sp.style.setProperty('--t', (1.4 + Math.random() * 1.4) + 's');
+      sp.style.fontSize = (12 + Math.random() * 22) + 'px';
+      sp.style.color = colors[Math.floor(Math.random() * colors.length)];
+      sp.addEventListener('animationend', function(){ if (this.parentNode) this.parentNode.removeChild(this); });
+      sparks.appendChild(sp);
+    }
+  }
+  function openCheer(target){
+    if (busy) return;
+    busy = true;
+    linksBox.classList.remove('open');
+    menuBtn.setAttribute('aria-expanded','false');
+    cheer.classList.add('show');
+    var left = 5;
+    cnt.textContent = left;
+    burst(30);
+    var bursts = setInterval(function(){ burst(14); }, 350);
+    var tick = setInterval(function(){
+      left--;
+      if (left > 0) cnt.textContent = left;
+    }, 1000);
+    setTimeout(function(){ clearInterval(bursts); }, 4300);
+    setTimeout(function(){
+      clearInterval(tick);
+      cheer.classList.remove('show');
+      sparks.innerHTML = '';
+      busy = false;
+      if (location.hash === target) route(); else location.hash = target;
+    }, 5000);
+  }
+  document.addEventListener('click', function(ev){
+    var a = ev.target.closest('[data-celebrate]');
+    if (!a) return;
+    ev.preventDefault();
+    openCheer(a.getAttribute('href'));
+  });
 })();
 </script>
 </body>
