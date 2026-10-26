@@ -238,6 +238,15 @@ footer .small{margin-top:34px;padding-top:20px;border-top:1px solid #39407a;font
   100%{transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(1) rotate(var(--r));opacity:0}
 }
 
+
+/* speech bubble from the mouth */
+.bubble{position:absolute;left:0;right:0;top:44%;z-index:2;background:var(--white);color:var(--navy);border:3px solid var(--navy);border-radius:18px;padding:16px 18px;box-shadow:5px 5px 0 var(--navy);font-family:var(--body);font-weight:500;font-size:1rem;line-height:1.42;min-height:118px;opacity:0;transform:scale(.8);transform-origin:57.7% 0;transition:opacity .45s,transform .45s}
+.bubble.on{opacity:1;transform:none}
+.bubble::before{content:"";position:absolute;left:calc(57.7% - 14px);top:-25px;width:0;height:0;border-left:14px solid transparent;border-right:14px solid transparent;border-bottom:22px solid var(--navy)}
+.bubble::after{content:"";position:absolute;left:calc(57.7% - 10px);top:-17px;width:0;height:0;border-left:10px solid transparent;border-right:10px solid transparent;border-bottom:17px solid var(--white)}
+#talk{transition:opacity .3s}
+@media (max-width:900px){.bubble{font-size:.92rem;padding:14px 15px}}
+
 /* responsive */
 @media (max-width:900px){
   .hero .grid,.about-grid,.contact-grid{grid-template-columns:1fr}
@@ -320,6 +329,7 @@ footer .small{margin-top:34px;padding-top:20px;border-top:1px solid #39407a;font
       <div class="photo-frame">
         <img class="me drop" id="heroPhoto" alt="Saheed Hamza, copywriter" width="400" height="500">
         <div class="sticker">Open for new projects</div>
+        <div class="bubble" id="bubble" aria-hidden="true"><div id="talk"></div></div>
       </div>
     </div>
   </div>
@@ -932,6 +942,88 @@ document.getElementById('form').addEventListener('submit', function(ev){
     ev.preventDefault();
     openCheer(a.getAttribute('href'));
   });
+})();
+
+/* speech bubble: types 3 sentences at a time, 1000 words in total, then starts again */
+(function(){
+  var SLIDES = [
+ "Hello 👋 Are you looking for a copywriter who turns words into money? Is your business not getting sales? Do people read your page and leave without a click?",
+ "Stay with me. Your problem has a clear cause. Your words do not speak to your buyer.",
+ "Buyers decide in seconds. A confusing page loses them fast. A clear page keeps them reading.",
+ "Perhaps you wrote your page alone. You described your product. Your buyer wants a result.",
+ "I fix this first. I find the result your buyer wants. I place this result in your headline.",
+ "Your headline has one job. Make the right person stop. Make this person read on.",
+ "Do you write what you like? Buyers read what helps them. I write for the buyer.",
+ "Is your email list quiet? People ignore weak subject lines. I write subject lines people open.",
+ "Short emails win. Each email gets one idea and one button. Your reader sees the next step.",
+ "Do you get visitors and no sales? Your page asks for too much. I give your buyer one clear action.",
+ "Is your offer hard to explain? I turn hard words into plain words. A child gets your point in seconds.",
+ "Are you tired of price shoppers? Weak copy attracts weak leads. Strong copy attracts serious buyers.",
+ "I speak to the buyer you want. I use the words your buyer uses. Serious people respond.",
+ "Do you pay for ads and get no clicks? Your ad words decide the result. A better first line gets more clicks.",
+ "One client got double the clicks. I rewrote the first few lines only. The layout stayed the same.",
+ "Another client saw sales rise 50% in two weeks. I rewrote the home page. I put the buyer's problem first.",
+ "One shop made 3 times more money from a single promo email. The list was dead before. Short, fun emails changed the result.",
+ "A tech team got buyers calling every day. The app was hard to explain. Plain words fixed the problem.",
+ "Do you lose sales to rivals? Rivals say the same words as you. I find what makes you different and I say this clearly.",
+ "Do you need blog posts? Readers leave long, messy posts. I write short paragraphs with clear headings.",
+ "Do you want Google to find your pages? I write SEO content with the words buyers search. Your page becomes easy to find and easy to read.",
+ "Do you post on social media and get no replies? Weak posts get scrolled past. I write strong first lines and short bullet points.",
+ "Do you sell products online? Dull descriptions stop sales. I write descriptions with benefits first.",
+ "Is your business message unclear? Your about page needs plain words. I write company profiles so people trust you fast.",
+ "Is your website long and messy? Visitors scroll and quit. I cut extra words and keep the selling words.",
+ "Do you sell a service? People buy trust first. I show your proof, your results, and your steps.",
+ "Do you run an app? Visitors ask what your app does. Your first line answers in seconds, and visitors stay and sign up.",
+ "Are you new in business? You have a good product. Few people see you yet, so clear words help strangers trust you.",
+ "Do you have content already? I improve what you have. I cut extra words and add one clear action.",
+ "Do you want repeat buyers? Good emails bring buyers again. I write welcome emails and emails for old customers.",
+ "Do you hate writing? Writing takes hours. I save you those hours.",
+ "Do you worry about price? Weak copy costs more than good copy. Lost sales cost money every day, and a clear page pays for itself.",
+ "Do you launch soon? Time runs short. I write fast so your launch stays on date.",
+ "You do not need a long process. We talk first. I research your buyers, write your draft, and edit with you.",
+ "Does your page sound like your rivals? Buyers skip pages with common words. I write lines only your business owns.",
+ "Do you lose buyers at the button? Weak button text gets ignored. I write button words which tell buyers what they get.",
+ "Is your price page confusing? Confused buyers leave. I explain your price in plain words and show the value.",
+ "Do you sell to busy people? Busy people skim. I put the main point first so skimmers still get your offer.",
+ "Do you offer a free trial? People ask why they should try. I answer in your first lines and you get more sign ups.",
+ "Do you worry about trust? Buyers want proof. I use real results, real reviews, and real numbers.",
+ "Do your emails sound cold? Buyers delete cold emails. I write with a warm, human voice.",
+ "Is your landing page weak? Ads bring visitors. A weak page wastes them, so I rewrite the page and visitors act.",
+ "Do you want more leads? Good leads come from clear offers. I write the offer, the proof, and the next step.",
+ "You get fast work. Clients say I finish early. Tell me your date and I tell you if I fit.",
+ "You get plain English. Short words. Short sentences with no fluff.",
+ "You get a human writer. I edit every line by hand. Your words keep a real voice.",
+ "You get one writer for many tasks. I write pages, emails, posts, and descriptions. Your voice stays the same.",
+ "Do you want monthly help? I offer a monthly plan. One client asked me to stay after one small page.",
+ "I design graphics too. Your words and your visuals match. You work with one person, not two.",
+ "You win when your buyers win. When you earn, I earn too. This is why I care about your result.",
+ "Ten clients wrote reviews. Read them on the Reviews page. Read the case studies to see the numbers.",
+ "Ready to turn words into money? Press Hire me now. Tell me what you sell and I tell you what to fix."
+];
+  var bubble = document.getElementById('bubble');
+  var box = document.getElementById('talk');
+  var idx = 0;
+  function show(){
+    var text = SLIDES[idx], chars = Array.from(text);
+    box.innerHTML = '<span class="tw-d"></span><span class="tw-h"></span>';
+    var d = box.firstChild, h = box.lastChild;
+    h.textContent = text;
+    bubble.classList.add('on');
+    if (reduce){ d.textContent = text; h.textContent = ''; setTimeout(next, 7000); return; }
+    box.classList.add('typing');
+    var i = 0;
+    var t = setInterval(function(){
+      i++;
+      d.textContent = chars.slice(0, i).join('');
+      h.textContent = chars.slice(i).join('');
+      if (i >= chars.length){ clearInterval(t); box.classList.remove('typing'); setTimeout(next, 2400); }
+    }, 36);
+  }
+  function next(){
+    box.style.opacity = 0;
+    setTimeout(function(){ idx = (idx + 1) % SLIDES.length; box.style.opacity = 1; show(); }, 350);
+  }
+  whenOpen(function(){ setTimeout(show, 1800); });
 })();
 </script>
 </body>
